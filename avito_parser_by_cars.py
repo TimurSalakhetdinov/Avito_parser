@@ -13,27 +13,27 @@ import traceback
 
 URL_AVITO = "https://www.avito.ru/all/avtomobili"
 
-brands = ['ac', 'acura', 'adler', 'aito', 'alfa romeo', 'alpina', 'alpine', 'amc', 'amphicar', 'arcfox', 'aro', 'asia', 
-          'aston martin', 'audi', 'aurus', 'austin', 'avatr', 'baic', 'baltijas dzips', 'baojun', 'barkas', 'baw', 
-          'belgee', 'bentley', 'bmw', 'borgward', 'brilliance', 'bugatti', 'buick', 'byd', 'cadillac', 'changan', 
-          'changfeng', 'changhe', 'chery', 'cheryexeed', 'chevrolet', 'chrysler', 'citroen', 'coggiola', 'cupra', 'dacia', 
-          'dadi', 'daewoo', 'daihatsu', 'datsun', 'dayun', 'denza', 'derways', 'dkw', 'dodge', 'dongfeng', 'doninvest', 'ds', 
-          'dw hower', 'eagle', 'e-car', 'evolute', 'exeed', 'fang cheng bao', 'faw', 'ferrari', 'fiat', 'ford', 'forthing', 
+brands = ['ac', 'acura', 'adler', 'aito', 'alfa_romeo', 'alpina', 'amc', 'amphicar', 'arcfox', 'aro', 'asia', 
+          'aston_martin', 'audi', 'aurus', 'austin', 'avatr', 'baic', 'bajaj', 'baltijas_dzips', 'baojun', 'barkas', 'baw', 
+          'belgee', 'bentley', 'blaval', 'bmw', 'borgward', 'brilliance', 'bugatti', 'buick', 'byd', 'cadillac', 'changan', 
+          'changfeng', 'chery', 'cheryexeed', 'chevrolet', 'chrysler', 'citroen', 'coggiola', 'cord', 'cupra', 'dacia', 
+          'dadi', 'daewoo', 'daihatsu', 'datsun', 'dayun', 'denza', 'derways', 'dodge', 'dongfeng', 'doninvest', 'ds', 
+          'dw_hower', 'eagle', 'evolute', 'exeed', 'fang_cheng_bao', 'faw', 'ferrari', 'fiat', 'ford', 'forthing', 
           'foton', 'fso', 'gac', 'geely', 'genesis', 'gmc', 'golden dragon', 'great wall', 'groz', 'hafei', 'haima', 'hanomag', 
-          'hanteng', 'haval', 'hawtai', 'hiphi', 'hispano-suiza', 'honda', 'hongqi', 'huanghai', 'hudson', 'hummer', 'hyundai', 
-          'infiniti', 'iran khodro', 'isuzu', 'iveco', 'jac', 'jaecoo', 'jaguar', 'jeep', 'jetour', 'jetta', 'jinbei', 'jmc', 
-          'kaiyi', 'kangaroo electro', 'kawei', 'kg mobility', 'kia', 'koenigsegg', 'kyc', 'lamborghini', 'lancia', 'land rover', 
-          'landwind', 'ldv', 'leapmotor', 'lexus', 'lifan', 'lincoln', 'livan', 'lixiang', 'lotus', 'lucid', 'luxgen', 'lynk & co', 
+          'haval', 'hawtai', 'hiphi', 'hispano-suiza', 'honda', 'hongqi', 'huanghai', 'hudson', 'humber', 'hummer', 'hycan', 'hyundai', 
+          'infiniti', 'iran_khodro', 'isuzu', 'iveco', 'jac', 'jaecoo', 'jaguar', 'jeep', 'jensen', 'jetour', 'jetta', 'jinbei', 'jmc', 
+          'jonway', 'junfeng', 'kaiyi', 'kangaroo_electro', 'karry', 'kawei', 'kg_mobility', 'kia', 'koenigsegg', 'kyc', 'lamborghini', 'lancia', 'land_rover', 
+          'landwind', 'ldv', 'leapmotor', 'lexus', 'lifan', 'lincoln', 'livan', 'lixiang', 'lotus', 'lti', 'lucid', 'luxgen', 'lynk_and_co', 
           'mahindra', 'man', 'maserati', 'maxus', 'maybach', 'mazda', 'mclaren', 'mengshi', 'mercedes-benz', 'mercury', 'metrocab', 
           'mg', 'm-hero', 'mini', 'mitsubishi', 'mitsuoka', 'morris', 'neta', 'nio', 'nissan', 'nysa', 'oldsmobile', 'omoda', 'opel', 
-          'ora', 'oshan', 'packard', 'pagani', 'peugeot', 'plymouth', 'polar stone (jishi)', 'polestar', 'pontiac', 'porsche', 'proton', 
-          'puch', 'qiyuan', 'qoros', 'radar', 'ram', 'ravon', 'rayton fissore', 'reliant', 'renault', 'renault samsung', 'rising auto', 
-          'rivian', 'roewe', 'rolls-royce', 'rover', 'saab', 'saic', 'saturn', 'scion', 'seat', 'seres', 'shuanghuan', 'simca', 'skoda', 
-          'skywell', 'sma', 'smart', 'sollers', 'soueast', 'ssangyong', 'steyr', 'streetscooter', 'subaru', 'suzuki', 'swm', 'talbot', 
-          'tank', 'tata', 'tatra', 'tesla', 'tianma', 'tianye', 'toyota', 'trabant', 'triumph', 'trumpchi', 'vauxhall', 'venucia', 'vgv', 
-          'volkswagen', 'volvo', 'vortex', 'voyah', 'wanderer', 'wartburg', 'weltmeister', 'wey', 'wiesmann', 'willys', 'wuling', 'xin kai', 
-          'xpeng', 'zastava', 'zeekr', 'zhiji', 'zotye', 'zuk', 'zx', 'автокам', 'богдан', 'vaz_lada', 'вис', 'газ', 'ераз', 'заз', 'зил', 
-          'зис', 'иж', 'канонир', 'комбат', 'луаз', 'москвич', 'раф', 'руссо-балт', 'смз', 'тагаз', 'уаз']
+          'ora', 'oshan', 'otin', 'packard', 'pagani', 'peugeot', 'plymouth', 'polar_stone_jishi', 'polestar', 'pontiac', 'porsche', 'proton', 
+          'puch', 'qiyuan', 'radar', 'ram', 'ravon', 'rayton_fissore', 'reliant', 'renault', 'renault_samsung', 'rising_auto', 
+          'rivian', 'roewe', 'rolls-royce', 'rover', 'saab', 'saturn', 'scion', 'seat', 'seres', 'shuanghuan', 'simca', 'skoda', 
+          'skywell', 'sma', 'smart', 'sol', 'solaris', 'sollers', 'soueast', 'ssangyong', 'steyr', 'subaru', 'suzuki', 'swm',  
+          'tank', 'tata', 'tatra', 'tazzari', 'tesla', 'tianma', 'tianye', 'toyota', 'trabant', 'triumph', 'trumpchi', 'tvr', 'vauxhall', 'venucia', 'vgv', 
+          'volkswagen', 'volvo', 'vortex', 'voyah', 'wanderer', 'wartburg', 'weltmeister', 'wey', 'wiesmann', 'willys', 'wuling', 'xin_kai', 
+          'xpeng', 'zeekr', 'zhiji', 'zotye', 'zuk', 'zx', 'avtokam', 'amberavto', 'bogdan', 'vaz_lada', 'vis', 'gaz', 'eraz', 'zaz', 'zil', 
+          'zis', 'izh', 'luaz', 'moskvich', 'raf', 'smz', 'tagaz', 'uaz']
 
 # Function to parse the Avito website
 def avito_parser(limit=None, save_to_db=False):
