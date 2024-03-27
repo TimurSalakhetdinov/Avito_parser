@@ -10,95 +10,120 @@ import sqlite3
 from datetime import datetime
 from random import randint
 import traceback
+import argparse
 
-URL_AVITO = "https://www.avito.ru/all/avtomobili"
-
-brands = ['ac', 'acura', 'adler', 'aito', 'alfa_romeo', 'alpina', 'amc', 'amphicar', 'arcfox', 'aro', 'asia', 
-          'aston_martin', 'audi', 'aurus', 'austin', 'avatr', 'baic', 'bajaj', 'baltijas_dzips', 'baojun', 'barkas', 'baw', 
-          'belgee', 'bentley', 'blaval', 'bmw', 'borgward', 'brilliance', 'bugatti', 'buick', 'byd', 'cadillac', 'changan', 
-          'changfeng', 'chery', 'cheryexeed', 'chevrolet', 'chrysler', 'citroen', 'coggiola', 'cord', 'cupra', 'dacia', 
-          'dadi', 'daewoo', 'daihatsu', 'datsun', 'dayun', 'denza', 'derways', 'dodge', 'dongfeng', 'doninvest', 'ds', 
-          'dw_hower', 'eagle', 'evolute', 'exeed', 'fang_cheng_bao', 'faw', 'ferrari', 'fiat', 'ford', 'forthing', 
-          'foton', 'fso', 'gac', 'geely', 'genesis', 'gmc', 'golden dragon', 'great wall', 'groz', 'hafei', 'haima', 'hanomag', 
-          'haval', 'hawtai', 'hiphi', 'hispano-suiza', 'honda', 'hongqi', 'huanghai', 'hudson', 'humber', 'hummer', 'hycan', 'hyundai', 
+# Brands that have less then 5000 cars on a page, so it can be parsed with one iteration
+#'ac', 'acura', 'adler', 'aito', 'alfa_romeo', 'alpina', 'amc', 'amphicar', 'arcfox', 'aro', 'asia', 
+#          'aston_martin', 'aurus', 'austin', 'avatr', 'baic', 'bajaj', 'baltijas_dzips', 'baojun', 'barkas', 'baw', 
+#          'belgee', 'bentley', 'blaval', 'borgward', 'brilliance', 'bugatti', 'buick', 'byd', 'cadillac',  
+#          'changfeng', 'cheryexeed', 'chrysler', 'citroen', 'coggiola', 'cord', 'cupra', 'dacia', 'dadi', 
+brands =  ['daewoo', 'daihatsu', 'datsun', 'dayun', 'denza', 'derways', 'dodge', 'dongfeng', 'doninvest', 'ds', 
+          'dw_hower', 'eagle', 'evolute', 'fang_cheng_bao', 'faw', 'ferrari', 'fiat', 'forthing', 
+          'foton', 'fso', 'gac', 'genesis', 'gmc', 'golden_dragon', 'great wall', 'groz', 'hafei', 'haima', 'hanomag', 
+          'hawtai', 'hiphi', 'hispano-suiza', 'hongqi', 'huanghai', 'hudson', 'humber', 'hummer', 'hycan',  
           'infiniti', 'iran_khodro', 'isuzu', 'iveco', 'jac', 'jaecoo', 'jaguar', 'jeep', 'jensen', 'jetour', 'jetta', 'jinbei', 'jmc', 
-          'jonway', 'junfeng', 'kaiyi', 'kangaroo_electro', 'karry', 'kawei', 'kg_mobility', 'kia', 'koenigsegg', 'kyc', 'lamborghini', 'lancia', 'land_rover', 
+          'jonway', 'junfeng', 'kaiyi', 'kangaroo_electro', 'karry', 'kawei', 'kg_mobility', 'koenigsegg', 'kyc', 'lamborghini', 'lancia', 'land_rover', 
           'landwind', 'ldv', 'leapmotor', 'lexus', 'lifan', 'lincoln', 'livan', 'lixiang', 'lotus', 'lti', 'lucid', 'luxgen', 'lynk_and_co', 
-          'mahindra', 'man', 'maserati', 'maxus', 'maybach', 'mazda', 'mclaren', 'mengshi', 'mercedes-benz', 'mercury', 'metrocab', 
-          'mg', 'm-hero', 'mini', 'mitsubishi', 'mitsuoka', 'morris', 'neta', 'nio', 'nissan', 'nysa', 'oldsmobile', 'omoda', 'opel', 
+          'mahindra', 'man', 'maserati', 'maxus', 'maybach', 'mazda', 'mclaren', 'mengshi', 'mercury', 'metrocab', 
+          'mg', 'm-hero', 'mini', 'mitsuoka', 'morris', 'neta', 'nio', 'nysa', 'oldsmobile',
           'ora', 'oshan', 'otin', 'packard', 'pagani', 'peugeot', 'plymouth', 'polar_stone_jishi', 'polestar', 'pontiac', 'porsche', 'proton', 
-          'puch', 'qiyuan', 'radar', 'ram', 'ravon', 'rayton_fissore', 'reliant', 'renault', 'renault_samsung', 'rising_auto', 
-          'rivian', 'roewe', 'rolls-royce', 'rover', 'saab', 'saturn', 'scion', 'seat', 'seres', 'shuanghuan', 'simca', 'skoda', 
+          'puch', 'qiyuan', 'radar', 'ram', 'ravon', 'rayton_fissore', 'reliant', 'renault_samsung', 'rising_auto', 
+          'rivian', 'roewe', 'rolls-royce', 'rover', 'saab', 'saturn', 'scion', 'seat', 'seres', 'shuanghuan', 'simca', 
           'skywell', 'sma', 'smart', 'sol', 'solaris', 'sollers', 'soueast', 'ssangyong', 'steyr', 'subaru', 'suzuki', 'swm',  
-          'tank', 'tata', 'tatra', 'tazzari', 'tesla', 'tianma', 'tianye', 'toyota', 'trabant', 'triumph', 'trumpchi', 'tvr', 'vauxhall', 'venucia', 'vgv', 
-          'volkswagen', 'volvo', 'vortex', 'voyah', 'wanderer', 'wartburg', 'weltmeister', 'wey', 'wiesmann', 'willys', 'wuling', 'xin_kai', 
-          'xpeng', 'zeekr', 'zhiji', 'zotye', 'zuk', 'zx', 'avtokam', 'amberavto', 'bogdan', 'vaz_lada', 'vis', 'gaz', 'eraz', 'zaz', 'zil', 
+          'tank', 'tata', 'tatra', 'tazzari', 'tesla', 'tianma', 'tianye', 'trabant', 'triumph', 'trumpchi', 'tvr', 'vauxhall', 'venucia', 'vgv', 
+          'volvo', 'vortex', 'voyah', 'wanderer', 'wartburg', 'weltmeister', 'wey', 'wiesmann', 'willys', 'wuling', 'xin_kai', 
+          'xpeng', 'zeekr', 'zhiji', 'zotye', 'zuk', 'zx', 'avtokam', 'amberavto', 'bogdan', 'vis', 'gaz', 'eraz', 'zaz', 'zil', 
           'zis', 'izh', 'luaz', 'moskvich', 'raf', 'smz', 'tagaz', 'uaz']
 
-# Function to parse the Avito website
+brand_name = [
+            "AC", "Acura", "Adler", "AITO", "Alfa Romeo", "Alpina", "Alpine", "AMC", "Amphicar", "Arcfox", "Aro", "Asia",
+            "Aston Martin", "Audi", "Aurus", "Austin", "Avatr", "BAIC", "Bajaj", "Baltijas Dzips", "Baojun", "Barkas", "BAW", "Belgee",
+            "Bentley", "BMW", "Blaval", "Borgward", "Brilliance", "Bugatti", "Buick", "BYD", "Cadillac", "Changan", "ChangFeng",
+            "Changhe", "Chery", "CheryExeed", "Chevrolet", "Chrysler", "Citroen", "Coggiola", "Cord", "Cupra", "Dacia", "Dadi",
+            "Daewoo", "Daihatsu", "Datsun", "Dayun", "Denza", "Derways", "DKW", "Dodge", "Dongfeng", "Doninvest", "DS",
+            "DW Hower", "Eagle", "E-Car", "Evolute", "EXEED", "Fang Cheng Bao", "FAW", "Ferrari", "FIAT", "Ford", "Forthing",
+            "Foton", "FSO", "GAC", "Geely", "Genesis", "GMC", "Golden Dragon", "Great Wall", "Groz", "Hafei", "Haima",
+            "Hanomag", "Hanteng", "Haval", "Hawtai", "HiPhi", "Hispano-Suiza", "Honda", "Hongqi", "Huanghai", "Hudson",
+            "Humber", "Hummer", "Hyundai", "Infiniti", "Iran Khodro", "Isuzu", "Iveco", "JAC", "JAECOO", "Jaguar", "Jeep", "Jetour",
+            "Jetta", "Jinbei", "JMC", "Kaiyi", "Kangaroo Electro", "Kawei", "KG Mobility", "Kia", "Koenigsegg", "KYC",
+            "Lamborghini", "Lancia", "Land Rover", "Landwind", "LDV", "Leapmotor", "Lexus", "LIFAN", "Lincoln", "Livan",
+            "LiXiang", "Lotus", "Lucid", "Luxgen", "Lynk & Co", "Mahindra", "MAN", "Maserati", "Maxus", "Maybach", "Mazda",
+            "McLaren", "Mengshi", "Mercedes-Benz", "Mercury", "Metrocab", "MG", "M-HERO", "MINI", "Mitsubishi", "Mitsuoka",
+            "Morris", "Neta", "NIO", "Nissan", "Nysa", "Oldsmobile", "OMODA", "Opel", "Ora", "Oshan", "Packard", "Pagani",
+            "Peugeot", "Plymouth", "Polar Stone (Jishi)", "Polestar", "Pontiac", "Porsche", "Proton", "PUCH", "Qiyuan",
+            "Qoros", "Radar", "RAM", "Ravon", "Rayton Fissore", "Reliant", "Renault", "Renault Samsung", "Rising Auto",
+            "Rivian", "Roewe", "Rolls-Royce", "Rover", "Saab", "Saic", "Saturn", "Scion", "SEAT", "Seres", "Shuanghuan",
+            "Simca", "Skoda", "Skywell", "SMA", "Smart", "Sollers", "Soueast", "SsangYong", "Steyr", "StreetScooter",
+            "Subaru", "Suzuki", "SWM", "Talbot", "Tank", "Tata", "Tatra", "Tesla", "Tianma", "Tianye", "Toyota", "Trabant",
+            "Triumph", "Trumpchi", "Vauxhall", "Venucia", "VGV", "Volkswagen", "Volvo", "Vortex", "Voyah", "Wanderer",
+            "Wartburg", "Weltmeister", "Wey", "Wiesmann", "Willys", "Wuling", "Xin Kai", "XPeng", "Zastava", "Zeekr", "Zhiji", "ZOTYE",
+            "Zuk", "ZX", "Автокам", "Богдан", "ВАЗ (LADA)", "ВИС", "ГАЗ", "ЕрАЗ", "ЗАЗ", "ЗИЛ", "ЗиС", "ИЖ", "Канонир",
+            "Комбат", "ЛуАЗ", "Москвич", "РАФ", "Руссо-Балт", "СМЗ", "ТагАЗ", "УАЗ"]
+
+# Function to parse brands with less then 5000 cars the Avito website
 def avito_parser(limit=None, save_to_db=False):
     options = webdriver.ChromeOptions()
+    #options.add_argument("--headless")
+    options.add_argument("start-maximized")
     options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36")
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(15)
-    driver.get(URL_AVITO)
 
     offers = []
     collected = 0
-    
-    # Wait for the main page to load
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, 'div[data-marker="catalog-serp"]'))
-    )
+    stop_processing = False
 
-    # Locate brand links using part of the href attribute
-    brands_elements = driver.find_elements(by=By.XPATH, value="//a[contains(@href, '/all/avtomobili/') and contains(@class, 'link-link')]")
-
-    # Loop through each brand
-    for brand_elem in brands_elements:
-        # Click the brand link to navigate to the brand-specific page
-        brand_href = brand_elem.get_attribute('href')
-        driver.get(brand_href)
-
-        # Wait for the brand page to load and detect the presence of the catalog
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'div[data-marker="catalog-serp"]'))
-        )
-        
-        # Click the "All" button to list all models
-        all_models_button = driver.find_element(by=By.XPATH, value='//button[@data-marker="catalog-filters/expand"]')
-        driver.execute_script("arguments[0].click();", all_models_button)
-        
-        # Wait until models are loaded (You may need to adjust this wait time)
-        sleep(3)
-
-        # Find all model links
-        model_links = driver.find_elements(by=By.CSS_SELECTOR, value='a[data-marker="link"]')
-        
-        # Loop through each model
-        for model_link in model_links:
-            driver.execute_script("arguments[0].click();", model_link)
+    for brand in brands:
+        if stop_processing:  # Check if we should stop processing before starting the next brand
+            break
+        try:
+            brand_url = f"https://www.avito.ru/all/avtomobili/{brand}"
+            driver.get(brand_url)
             
-            # Wait until the model page is loaded
-            sleep(3)
+            # Check if there are any cars listed for the brand, if not, skip to the next brand
+            if not driver.find_elements(by=By.CSS_SELECTOR, value='div[data-marker="item"]'):
+                print(f"No cars listed for brand {brand}. Skipping to next brand.")
+                continue
 
             while True:
                 elems = driver.find_elements(by=By.CSS_SELECTOR, value='div[data-marker="item"]')
                 for elem in elems:
                     if limit and collected >= limit:
-                        break
+                        stop_processing = True  # Set the flag to true to stop processing further brands
+                        break  # Break out of the inner loop
 
                     try:
                         avito_id = int(elem.get_attribute("id")[1:])
-                        #url = elem.find_element(by=By.CSS_SELECTOR, value='a[itemprop="url"]').get_attribute("href")
 
-                        # Adjusted selector for item_title based on the structure provided
+                        # Selector for item_title based on the structure provided
                         item_title_container = elem.find_element(by=By.XPATH, value='.//div[contains(@class, "titleStep")]//h3')
-                        item_title = item_title_container.text.split(', ')
-                        full_title = item_title[0].strip()
-                        model_parts = full_title.split()[:-2]
-                        model = ' '.join(model_parts)
-                        year = re.search(r'\b\d{4}\b', item_title[1]).group()
+                        item_title = item_title_container.text.strip()
+
+                        # Split the title by commas to separate the title from other details like the year
+                        split_title = item_title.split(',')
+
+                        # Extract the brand and model from the first part of the split title
+                        brand_model_cleaned = split_title[0].strip()
+
+                        # Find the longest matching brand in the cleaned title
+                        matched_brand = ''
+                        for brand in brand_name:
+                            if brand_model_cleaned.lower().startswith(brand.lower()) and len(brand) > len(matched_brand):
+                                matched_brand = brand
+
+                        # If a brand is matched, extract it and the subsequent text as the model
+                        if matched_brand:
+                            model = brand_model_cleaned[len(matched_brand):].strip()
+                        else:
+                            # If no brand is matched, further logic will be needed to handle this case
+                            model = brand_model_cleaned  # Fallback to using the entire cleaned text as the model
+
+                        # Extract the year from the second part, if it exists
+                        year = re.search(r'\b\d{4}\b', split_title[1]).group() if len(split_title) > 1 else None
+
+                        # You now have the brand, model, and year extracted
+                        brand = matched_brand if matched_brand else 'Unknown'
 
                         # Locate the container for specific parameters using the data-marker attribute item-specific-params
                         item_params_container = elem.find_element(by=By.XPATH, value='.//div[contains(.//p/@data-marker, "item-specific-params")]')
@@ -113,45 +138,44 @@ def avito_parser(limit=None, save_to_db=False):
 
                         # Locate the container for the region using a class name that seems to be consistent
                         region_container = elem.find_element(by=By.XPATH, value='.//div[contains(@class, "geo-root")]//span')
-                        region = region_container.text
+                        region_full_text = region_container.text
+                        region = region_full_text.split(',')[0].strip()
 
                         today = datetime.now().date()
 
                         result = {
                             "ID": avito_id,
+                            "Brand": brand,
                             "Model": model,
                             "Year": year if year else None,
                             "Power": power if power else None,
                             "Price": price if price else None,
                             "Region": region if region else None,
                             "Today": today,
-                        #    "URL": url,
                         }
                         offers.append(result)
                         collected += 1
 
                     except Exception as e:
-                        print(f"An error occurred at {collected}: {e}")
+                        print(f"An error occurred while processing {brand} at {collected}: {e}")
                         traceback.print_exc()
 
-                if limit and collected >= limit:
+                if stop_processing or (limit and collected >= limit):
                     break
 
-                # Pagination to go through all the pages of the model
                 try:
-                    next_button = driver.find_element(by=By.XPATH, value='//a[@data-marker="pagination-button/next"]')
+                    next_button = driver.find_element(by=By.XPATH, value='//a[@data-marker="pagination-button/nextPage"]')
                     driver.execute_script("arguments[0].click();", next_button)
-                    sleep(randint(5, 10))  # Sleep for a short while to wait for the page to load
+                    sleep(randint(3, 7))  # Sleep for a short while to wait for the page to load
+
                 except NoSuchElementException:
-                    print("No more pages for this model.")
+                    print(f"No more pages to parse for {brand}.")
                     break
 
-            # After finishing with one model, navigate back to the brand's models list
-            driver.execute_script("window.history.go(-1)")
-
-        # Close the brand tab and switch back to the main window
-        driver.close()
-        driver.switch_to.window(driver.window_handles[0])
+        except Exception as e:
+            print(f"An error occurred while trying to access the page for brand {brand}: {e}")
+            traceback.print_exc()
+            continue  # Skip to the next brand
 
     driver.quit()
 
@@ -162,10 +186,12 @@ def avito_parser(limit=None, save_to_db=False):
 
     return offers
 
+# Function to save data to Excel
 def save_to_excel(offers):
     df = pd.DataFrame(offers)
-    df.to_excel('avito_offers.xlsx', index=False)
+    df.to_excel('avito_cars_less_5000.xlsx', index=False)
 
+# Function to save data to db
 def save_to_database(offers):
     conn = sqlite3.connect('avito_cars.db')
     c = conn.cursor()
@@ -173,36 +199,45 @@ def save_to_database(offers):
     c.execute('''
         CREATE TABLE IF NOT EXISTS cars (
             ID INTEGER PRIMARY KEY,
+            Brand TEXT,
             Model TEXT,
             Year INTEGER,
             Power INTEGER,
             Price INTEGER,
             Region TEXT,
-            Time TEXT,
-            Today DATE,
-            URL TEXT
+            Today DATE
         )
     ''')
 
     # Insert data into the table
     for offer in offers:
         c.execute('''
-            INSERT INTO cars (ID, Model, Year, Power, Price, Region, Time, Today, URL)
+            INSERT INTO cars (ID, Brand, Model, Year, Power, Price, Region, Today)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             offer["ID"], 
+            offer["Brand"], 
             offer["Model"], 
             offer["Year"], 
             offer["Power"], 
             offer["Price"], 
             offer["Region"], 
-            offer["Time"], 
-            offer["Today"], 
-            offer["URL"]
+            offer["Today"]
         ))
 
     conn.commit()
     conn.close()
 
 if __name__ == "__main__":
-    offers = avito_parser(limit=5, save_to_db=False)  # Set limit=None to process all cars, set save_to_db=True to save to the database
+    # Initialize the parser
+    parser = argparse.ArgumentParser(description='Parse Avito for car offers.')
+    # Add the 'limit' argument
+    parser.add_argument('--limit', type=int, help='Limit the number of cars to parse', default=None)
+    # Add the 'save_to_db' argument
+    parser.add_argument('--save_to_db', action='store_true', help='Save the results to the database')
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Call the avito_parser function with the provided arguments
+    offers = avito_parser(limit=args.limit, save_to_db=args.save_to_db)
