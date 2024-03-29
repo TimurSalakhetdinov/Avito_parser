@@ -10,14 +10,25 @@ import sqlite3
 from datetime import datetime
 from random import randint
 import traceback
+import argparse
 
 URL_AVITO = "https://www.avito.ru/all/avtomobili"
 
-brands_5000 = ['audi', 'bmw', 'changan', 'chery', 'chevrolet', 'exeed', 'ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mercedes-benz', 'mitsubishi', 'nissan', 
-               'omoda', 'opel', 'renault', 'skoda', 'toyota', 'volkswagen', 'vaz_lada']
+brands = ['audi', 'bmw', 'changan', 'chery', 'chevrolet', 'exeed', 'ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mazda',  
+               'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota', 'volkswagen', 'gaz', 'vaz_lada']
 
-# Function to parse brands from the Avito website with more then 5000
-def avito_parser_5000(limit=None, save_to_db=False):
+# Function to read brand names
+def load_brand_names(file_name):
+    with open(file_name, 'r') as file:
+        # Read each line in the file, strip leading/trailing whitespace, and ignore empty lines
+        brand_names = [line.strip() for line in file if line.strip()]
+    return brand_names
+
+# Load brand names
+brand_name = load_brand_names('brands.txt')
+
+# Function to parse popular brands from the Avito website with more then 5000
+def avito_parser_popular(limit=None, save_to_db=False):
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-blink-features=AutomationControlled")
     driver = webdriver.Chrome(options=options)
@@ -141,10 +152,12 @@ def avito_parser_5000(limit=None, save_to_db=False):
 
     return offers
 
+# Save to Excel
 def save_to_excel(offers):
     df = pd.DataFrame(offers)
-    df.to_excel('avito_offers.xlsx', index=False)
+    df.to_excel('avito_offers_popular.xlsx', index=False)
 
+# Save to DB
 def save_to_database(offers):
     conn = sqlite3.connect('avito_cars.db')
     c = conn.cursor()
@@ -180,4 +193,15 @@ def save_to_database(offers):
     conn.close()
 
 if __name__ == "__main__":
-    offers = avito_parser_5000(limit=5, save_to_db=False)  # Set limit=None to process all cars, set save_to_db=True to save to the database
+    # Initialize the parser
+    parser = argparse.ArgumentParser(description='Parse Avito for car offers.')
+    # Add the 'limit' argument
+    parser.add_argument('--limit', type=int, help='Limit the number of cars to parse', default=None)
+    # Add the 'save_to_db' argument
+    parser.add_argument('--save_to_db', action='store_true', help='Save the results to the database')
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Call the avito_parser function with the provided arguments
+    offers = avito_parser_popular(limit=args.limit, save_to_db=args.save_to_db)

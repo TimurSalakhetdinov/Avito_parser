@@ -13,52 +13,38 @@ import traceback
 import argparse
 
 # Brands that have less then 5000 cars on a page, so it can be parsed with one iteration
-#'ac', 'acura', 'adler', 'aito', 'alfa_romeo', 'alpina', 'amc', 'amphicar', 'arcfox', 'aro', 'asia', 
-#          'aston_martin', 'aurus', 'austin', 'avatr', 'baic', 'bajaj', 'baltijas_dzips', 'baojun', 'barkas', 'baw', 
-#          'belgee', 'bentley', 'blaval', 'borgward', 'brilliance', 'bugatti', 'buick', 'byd', 'cadillac',  
-#          'changfeng', 'cheryexeed', 'chrysler', 'citroen', 'coggiola', 'cord', 'cupra', 'dacia', 'dadi', 
-brands =  ['daewoo', 'daihatsu', 'datsun', 'dayun', 'denza', 'derways', 'dodge', 'dongfeng', 'doninvest', 'ds', 
+brands =  [
+          'ac', 'acura', 'adler', 'aito', 'alfa_romeo', 'alpina', 'amc', 'amphicar', 'arcfox', 'aro', 'asia', 
+          'aston_martin', 'aurus', 'austin', 'avatr', 'baic', 'bajaj', 'baltijas_dzips', 'baojun', 'barkas', 'baw', 
+          'belgee', 'bentley', 'blaval', 'borgward', 'brilliance', 'bugatti', 'buick', 'byd', 'cadillac',  
+          'changfeng', 'cheryexeed', 'chrysler', 'citroen', 'coggiola', 'cord', 'cupra', 'dacia', 'dadi', 
+          'daewoo', 'daihatsu', 'datsun', 'dayun', 'denza', 'derways', 'dodge', 'dongfeng', 'doninvest', 'ds', 
           'dw_hower', 'eagle', 'evolute', 'fang_cheng_bao', 'faw', 'ferrari', 'fiat', 'forthing', 
           'foton', 'fso', 'gac', 'genesis', 'gmc', 'golden_dragon', 'great wall', 'groz', 'hafei', 'haima', 'hanomag', 
           'hawtai', 'hiphi', 'hispano-suiza', 'hongqi', 'huanghai', 'hudson', 'humber', 'hummer', 'hycan',  
           'infiniti', 'iran_khodro', 'isuzu', 'iveco', 'jac', 'jaecoo', 'jaguar', 'jeep', 'jensen', 'jetour', 'jetta', 'jinbei', 'jmc', 
-          'jonway', 'junfeng', 'kaiyi', 'kangaroo_electro', 'karry', 'kawei', 'kg_mobility', 'koenigsegg', 'kyc', 'lamborghini', 'lancia', 'land_rover', 
-          'landwind', 'ldv', 'leapmotor', 'lexus', 'lifan', 'lincoln', 'livan', 'lixiang', 'lotus', 'lti', 'lucid', 'luxgen', 'lynk_and_co', 
+          'jonway', 'junfeng', 'kaiyi', 'kangaroo_electro', 'karry', 'kawei', 'kg_mobility', 'koenigsegg', 'kyc', 'lamborghini', 'lancia',
+          'land_rover', 'landwind', 'ldv', 'leapmotor', 'lexus', 'lifan', 'lincoln', 'livan', 'lixiang', 'lotus', 'lti', 'lucid', 'luxgen', 'lynk_and_co', 
           'mahindra', 'man', 'maserati', 'maxus', 'maybach', 'mazda', 'mclaren', 'mengshi', 'mercury', 'metrocab', 
-          'mg', 'm-hero', 'mini', 'mitsuoka', 'morris', 'neta', 'nio', 'nysa', 'oldsmobile',
-          'ora', 'oshan', 'otin', 'packard', 'pagani', 'peugeot', 'plymouth', 'polar_stone_jishi', 'polestar', 'pontiac', 'porsche', 'proton', 
-          'puch', 'qiyuan', 'radar', 'ram', 'ravon', 'rayton_fissore', 'reliant', 'renault_samsung', 'rising_auto', 
+          'mg', 'mini', 'mitsuoka', 'morris', 'neta', 'nio', 'nysa', 'oldsmobile',
+          'ora', 'oshan', 'packard', 'pagani', 'peugeot', 'plymouth', 'polar_stone_jishi', 'polestar', 'pontiac', 'porsche', 'proton', 
+          'puch', 'ram', 'ravon', 'rayton_fissore', 'reliant', 'renault_samsung', 'rising_auto', 
           'rivian', 'roewe', 'rolls-royce', 'rover', 'saab', 'saturn', 'scion', 'seat', 'seres', 'shuanghuan', 'simca', 
           'skywell', 'sma', 'smart', 'sol', 'solaris', 'sollers', 'soueast', 'ssangyong', 'steyr', 'subaru', 'suzuki', 'swm',  
           'tank', 'tata', 'tatra', 'tazzari', 'tesla', 'tianma', 'tianye', 'trabant', 'triumph', 'trumpchi', 'tvr', 'vauxhall', 'venucia', 'vgv', 
           'volvo', 'vortex', 'voyah', 'wanderer', 'wartburg', 'weltmeister', 'wey', 'wiesmann', 'willys', 'wuling', 'xin_kai', 
-          'xpeng', 'zeekr', 'zhiji', 'zotye', 'zuk', 'zx', 'avtokam', 'amberavto', 'bogdan', 'vis', 'gaz', 'eraz', 'zaz', 'zil', 
+          'xpeng', 'zeekr', 'zotye', 'zuk', 'zx', 'avtokam', 'bogdan', 'vis', 'eraz', 'zaz', 'zil', 
           'zis', 'izh', 'luaz', 'moskvich', 'raf', 'smz', 'tagaz', 'uaz']
 
-brand_name = [
-            "AC", "Acura", "Adler", "AITO", "Alfa Romeo", "Alpina", "Alpine", "AMC", "Amphicar", "Arcfox", "Aro", "Asia",
-            "Aston Martin", "Audi", "Aurus", "Austin", "Avatr", "BAIC", "Bajaj", "Baltijas Dzips", "Baojun", "Barkas", "BAW", "Belgee",
-            "Bentley", "BMW", "Blaval", "Borgward", "Brilliance", "Bugatti", "Buick", "BYD", "Cadillac", "Changan", "ChangFeng",
-            "Changhe", "Chery", "CheryExeed", "Chevrolet", "Chrysler", "Citroen", "Coggiola", "Cord", "Cupra", "Dacia", "Dadi",
-            "Daewoo", "Daihatsu", "Datsun", "Dayun", "Denza", "Derways", "DKW", "Dodge", "Dongfeng", "Doninvest", "DS",
-            "DW Hower", "Eagle", "E-Car", "Evolute", "EXEED", "Fang Cheng Bao", "FAW", "Ferrari", "FIAT", "Ford", "Forthing",
-            "Foton", "FSO", "GAC", "Geely", "Genesis", "GMC", "Golden Dragon", "Great Wall", "Groz", "Hafei", "Haima",
-            "Hanomag", "Hanteng", "Haval", "Hawtai", "HiPhi", "Hispano-Suiza", "Honda", "Hongqi", "Huanghai", "Hudson",
-            "Humber", "Hummer", "Hyundai", "Infiniti", "Iran Khodro", "Isuzu", "Iveco", "JAC", "JAECOO", "Jaguar", "Jeep", "Jetour",
-            "Jetta", "Jinbei", "JMC", "Kaiyi", "Kangaroo Electro", "Kawei", "KG Mobility", "Kia", "Koenigsegg", "KYC",
-            "Lamborghini", "Lancia", "Land Rover", "Landwind", "LDV", "Leapmotor", "Lexus", "LIFAN", "Lincoln", "Livan",
-            "LiXiang", "Lotus", "Lucid", "Luxgen", "Lynk & Co", "Mahindra", "MAN", "Maserati", "Maxus", "Maybach", "Mazda",
-            "McLaren", "Mengshi", "Mercedes-Benz", "Mercury", "Metrocab", "MG", "M-HERO", "MINI", "Mitsubishi", "Mitsuoka",
-            "Morris", "Neta", "NIO", "Nissan", "Nysa", "Oldsmobile", "OMODA", "Opel", "Ora", "Oshan", "Packard", "Pagani",
-            "Peugeot", "Plymouth", "Polar Stone (Jishi)", "Polestar", "Pontiac", "Porsche", "Proton", "PUCH", "Qiyuan",
-            "Qoros", "Radar", "RAM", "Ravon", "Rayton Fissore", "Reliant", "Renault", "Renault Samsung", "Rising Auto",
-            "Rivian", "Roewe", "Rolls-Royce", "Rover", "Saab", "Saic", "Saturn", "Scion", "SEAT", "Seres", "Shuanghuan",
-            "Simca", "Skoda", "Skywell", "SMA", "Smart", "Sollers", "Soueast", "SsangYong", "Steyr", "StreetScooter",
-            "Subaru", "Suzuki", "SWM", "Talbot", "Tank", "Tata", "Tatra", "Tesla", "Tianma", "Tianye", "Toyota", "Trabant",
-            "Triumph", "Trumpchi", "Vauxhall", "Venucia", "VGV", "Volkswagen", "Volvo", "Vortex", "Voyah", "Wanderer",
-            "Wartburg", "Weltmeister", "Wey", "Wiesmann", "Willys", "Wuling", "Xin Kai", "XPeng", "Zastava", "Zeekr", "Zhiji", "ZOTYE",
-            "Zuk", "ZX", "Автокам", "Богдан", "ВАЗ (LADA)", "ВИС", "ГАЗ", "ЕрАЗ", "ЗАЗ", "ЗИЛ", "ЗиС", "ИЖ", "Канонир",
-            "Комбат", "ЛуАЗ", "Москвич", "РАФ", "Руссо-Балт", "СМЗ", "ТагАЗ", "УАЗ"]
+# Function to read brand names
+def load_brand_names(file_name):
+    with open(file_name, 'r') as file:
+        # Read each line in the file, strip leading/trailing whitespace, and ignore empty lines
+        brand_names = [line.strip() for line in file if line.strip()]
+    return brand_names
+
+# Load brand names
+brand_name = load_brand_names('brands.txt')
 
 # Function to parse brands with less then 5000 cars the Avito website
 def avito_parser(limit=None, save_to_db=False):
@@ -166,7 +152,7 @@ def avito_parser(limit=None, save_to_db=False):
                 try:
                     next_button = driver.find_element(by=By.XPATH, value='//a[@data-marker="pagination-button/nextPage"]')
                     driver.execute_script("arguments[0].click();", next_button)
-                    sleep(randint(3, 7))  # Sleep for a short while to wait for the page to load
+                    sleep(randint(2, 6))  # Sleep for a short while to wait for the page to load
 
                 except NoSuchElementException:
                     print(f"No more pages to parse for {brand}.")
