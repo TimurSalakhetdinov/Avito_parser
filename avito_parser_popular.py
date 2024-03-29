@@ -133,7 +133,6 @@ def avito_parser_popular(brand, links, limit=None):
                     driver.execute_script("arguments[0].click();", next_button)
                     sleep(randint(2, 6))  # Sleep for a short while to wait for the page to load
                 except NoSuchElementException:
-                    print("No more pages to parse for the current link.")
                     break
 
         except Exception as e:
