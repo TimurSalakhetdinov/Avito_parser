@@ -31,8 +31,7 @@ def load_links(brand):
 
 # List of brands for which you have corresponding text files
 # brands = ['audi', 'bmw', 'changan', 'chery', 'chevrolet', 'exeed']
-brands = ['chery',] 
-          #'ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mazda',]  
+brands = ['ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mazda',]  
           #'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota', 'volkswagen', 'gaz', 'vaz_lada']
 
 # Function to parse brands from the Avito website
@@ -147,14 +146,14 @@ def avito_parser_popular(brand, links, limit=None):
     driver.quit()
 
     # Save to an Excel file specific to the brand
-    save_to_csv(offers, brand)
+    save_to_excel(offers, brand)
 
 # Function to save data to CSV, named after the brand
-def save_to_csv(offers, brand):
+def save_to_excel(offers, brand):
     df = pd.DataFrame(offers)
     # Update the filename extension to '.csv'
-    filename = f'avito_cars_{brand}.csv'
-    df.to_csv(filename, index=False)
+    filename = f'avito_cars_{brand}.xlsx'
+    df.to_excel(filename, index=False)
     print(f"Data for {brand} saved to {filename}")
 
 if __name__ == "__main__":
