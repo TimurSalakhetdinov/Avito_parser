@@ -127,8 +127,6 @@ def avito_parser(limit=None, save_to_db=False):
                         region_full_text = region_container.text
                         region = region_full_text.split(',')[0].strip()
 
-                        today = datetime.now().date()
-
                         result = {
                             "ID": avito_id,
                             "Brand": brand,
@@ -136,8 +134,7 @@ def avito_parser(limit=None, save_to_db=False):
                             "Year": year if year else None,
                             "Power": power if power else None,
                             "Price": price if price else None,
-                            "Region": region if region else None,
-                            "Today": today,
+                            "Region": region if region else None
                         }
                         offers.append(result)
                         collected += 1
