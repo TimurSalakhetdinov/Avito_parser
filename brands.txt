@@ -250,3 +250,31 @@ Russo-Balt
 SMZ
 TagAZ
 UAZ
+DongFeng
+FAW
+Foton
+Hino
+Howo
+Hyundai
+Isuzu
+IVECO
+IVECO-Hongyan
+JAC
+LGMG
+MAN
+Mercedes-Benz
+Mitsubishi Fuso
+Nissan
+Sany
+Scania
+Shacman (Shaanxi)
+SITRAK
+Tonly
+Volvo
+Zauberg
+ГАЗ
+ЗИЛ
+КАМАЗ
+МАЗ
+Урал
+УралСпецТранс

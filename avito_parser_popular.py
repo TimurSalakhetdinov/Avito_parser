@@ -30,14 +30,15 @@ def load_links(brand):
     return links
 
 # List of brands for which you have corresponding text files
-# brands = ['audi', 'bmw', 'changan', 'chery', 'chevrolet', 'exeed']
-brands = ['ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mazda',]  
-          #'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota', 'volkswagen', 'gaz', 'vaz_lada']
+# brands = ['audi', 'bmw', 'changan', 'chery', 'chevrolet', 'exeed', 'ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mazda',
+            #'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota',
+brands = ['omoda',]
+              #'volkswagen', 'gaz', 'vaz_lada', 'gruzovik']
 
 # Function to parse brands from the Avito website
 def avito_parser_popular(brand, links, limit=None):
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    #options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("start-maximized")
@@ -133,6 +134,7 @@ def avito_parser_popular(brand, links, limit=None):
                     driver.execute_script("arguments[0].click();", next_button)
                     sleep(randint(2, 6))  # Sleep for a short while to wait for the page to load
                 except NoSuchElementException:
+                    print(f"Finished with link: {link}")
                     break
 
         except Exception as e:
@@ -145,10 +147,9 @@ def avito_parser_popular(brand, links, limit=None):
     # Save to an Excel file specific to the brand
     save_to_excel(offers, brand)
 
-# Function to save data to CSV, named after the brand
+# Function to save data to Excel, named after the brand
 def save_to_excel(offers, brand):
     df = pd.DataFrame(offers)
-    # Update the filename extension to '.csv'
     filename = f'avito_cars_{brand}.xlsx'
     df.to_excel(filename, index=False)
     print(f"Data for {brand} saved to {filename}")
