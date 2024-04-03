@@ -31,9 +31,8 @@ def load_links(brand):
 
 # List of brands for which you have corresponding text files
 # brands = ['audi', 'bmw', 'changan', 'chery', 'chevrolet', 'exeed', 'ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mazda',
-            #'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota',
-brands = ['omoda',]
-              #'volkswagen', 'gaz', 'vaz_lada', 'gruzovik']
+            #'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota', 'omoda',
+brands = ['toyota', 'volkswagen', 'gaz', 'vaz_lada', 'gruzovik']
 
 # Function to parse brands from the Avito website
 def avito_parser_popular(brand, links, limit=None):
