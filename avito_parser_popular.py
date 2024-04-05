@@ -31,15 +31,15 @@ def load_links(brand):
 
 # List of brands for which you have corresponding text files
 # brands = ['audi', 'bmw', 'changan', 'chery', 'chevrolet', 'exeed', 'ford', 'geely', 'haval', 'honda', 'hyundai', 'kia', 'mazda',
-            #'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota', 'omoda',
-brands = ['toyota', 'volkswagen', 'gaz', 'vaz_lada', 'gruzovik']
+            #'mercedes-benz', 'mitsubishi', 'nissan', 'omoda', 'opel', 'renault', 'skoda', 'toyota', 'omoda', 'toyota', 'volkswagen', 'gaz', 'vaz_lada',
+brands = ['gruzovik']
 
 # Function to parse brands from the Avito website
 def avito_parser_popular(brand, links, limit=None):
     options = webdriver.ChromeOptions()
     #options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
+    #options.add_argument("--disable-gpu")
+    #options.add_argument("--no-sandbox")
     options.add_argument("start-maximized")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36")
@@ -64,12 +64,25 @@ def avito_parser_popular(brand, links, limit=None):
                     try:
                         avito_id = int(elem.get_attribute("id")[1:])
 
+                        # Locate the container for specific parameters using the data-marker attribute item-specific-params
+                        item_params_container = elem.find_element(by=By.XPATH, value='.//div[contains(.//p/@data-marker, "item-specific-params")]')
+                        item_params = item_params_container.find_element(by=By.CSS_SELECTOR, value='p').text
+                        if 'Битый' in item_params:
+                            continue  # Skip this car because it is marked as 'Битый'
+
                         # Selector for item_title based on the structure provided
                         item_title_container = elem.find_element(by=By.XPATH, value='.//div[contains(@class, "titleStep")]//h3')
                         item_title = item_title_container.text.strip()
-
-                        # Split the title by commas to separate the title from other details like the year
                         split_title = item_title.split(',')
+
+                        # Extract the year from the second part, if it exists and check if it is less than 2012
+                        year_match = re.search(r'\b\d{4}\b', split_title[1]).group() if len(split_title) > 1 else None
+                        if year_match:
+                            year = int(year_match)
+                            if year < 2012:
+                                continue  # Skip this car because its year is less than 2012
+                        else:
+                            year = None  # Set to None if year is not found
 
                         # Extract the brand and model from the first part of the split title
                         brand_model_cleaned = split_title[0].strip()
@@ -87,17 +100,12 @@ def avito_parser_popular(brand, links, limit=None):
                             # If no brand is matched, further logic will be needed to handle this case
                             model = brand_model_cleaned  # Fallback to using the entire cleaned text as the model
 
-                        # Extract the year from the second part, if it exists
-                        year = re.search(r'\b\d{4}\b', split_title[1]).group() if len(split_title) > 1 else None
-
                         # You now have the brand, model, and year extracted
                         brand = matched_brand if matched_brand else 'Unknown'
 
-                        # Locate the container for specific parameters using the data-marker attribute item-specific-params
-                        item_params_container = elem.find_element(by=By.XPATH, value='.//div[contains(.//p/@data-marker, "item-specific-params")]')
-                        item_params = item_params_container.find_element(by=By.CSS_SELECTOR, value='p').text
-                        power_match = re.search(r'\((\d+)\s*л\.с\.\)', item_params)
-                        power = power_match.group(1) if power_match else "N/A"
+                        # Get power from item-specific-params
+                        #power_match = re.search(r'\((\d+)\s*л\.с\.\)', item_params)
+                        #power = power_match.group(1) if power_match else "N/A"
 
                         # Locate the parent `div` of the `p` element that contains the price
                         item_price_container = elem.find_element(by=By.XPATH, value='.//div[contains(.//p/@data-marker, "item-price")]')
@@ -105,18 +113,18 @@ def avito_parser_popular(brand, links, limit=None):
                         price = ''.join(re.findall(r'\d+', item_price))
 
                         # Locate the container for the region using a class name that seems to be consistent
-                        region_container = elem.find_element(by=By.XPATH, value='.//div[contains(@class, "geo-root")]//span')
-                        region_full_text = region_container.text
-                        region = region_full_text.split(',')[0].strip()
+                        #region_container = elem.find_element(by=By.XPATH, value='.//div[contains(@class, "geo-root")]//span')
+                        #region_full_text = region_container.text
+                        #region = region_full_text.split(',')[0].strip()
 
                         result = {
                             "ID": avito_id,
                             "Brand": brand,
                             "Model": model,
                             "Year": year if year else None,
-                            "Power": power if power else None,
+                        #    "Power": power if power else None,
                             "Price": price if price else None,
-                            "Region": region if region else None
+                        #    "Region": region if region else None
                         }
                         offers.append(result)
                         collected += 1
@@ -131,7 +139,7 @@ def avito_parser_popular(brand, links, limit=None):
                 try:
                     next_button = driver.find_element(by=By.XPATH, value='//a[@data-marker="pagination-button/nextPage"]')
                     driver.execute_script("arguments[0].click();", next_button)
-                    sleep(randint(2, 6))  # Sleep for a short while to wait for the page to load
+                    sleep(randint(1, 4))  # Sleep for a short while to wait for the page to load
                 except NoSuchElementException:
                     print(f"Finished with link: {link}")
                     break

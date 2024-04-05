@@ -49,7 +49,7 @@ brand_name = load_brand_names('brands.txt')
 # Function to parse brands with less then 5000 cars the Avito website
 def avito_parser(limit=None, save_to_db=False):
     options = webdriver.ChromeOptions()
-    #options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument("start-maximized")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36")
@@ -149,7 +149,7 @@ def avito_parser(limit=None, save_to_db=False):
                 try:
                     next_button = driver.find_element(by=By.XPATH, value='//a[@data-marker="pagination-button/nextPage"]')
                     driver.execute_script("arguments[0].click();", next_button)
-                    sleep(randint(2, 6))  # Sleep for a short while to wait for the page to load
+                    sleep(randint(1, 5))  # Sleep for a short while to wait for the page to load
 
                 except NoSuchElementException:
                     print(f"No more pages to parse for {brand}.")
